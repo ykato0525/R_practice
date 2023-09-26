@@ -1,0 +1,181 @@
+---
+title: "1日目"
+author: "Yu Kato"
+date: '20230925'
+output:
+  html_document:
+    toc: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+# おまじない
+```{r}
+# install.packages("tidyverse")
+library(tidyverse)
+```
+
+# Rにおけるデータと型
+プログラミングをするにあたり「型」の概念は重要
+Rは型の種類が少ないので簡単だが、数と文字列はきちんと意識してわけないとエラーの原因となる
+- integer(numeric): 整数型
+- doububle(numeric): 実数型
+- complex: 複素数型
+- character: 文字型
+- logical: 論理型
+
+```{R}
+# 数字型
+a <- 1.0
+print(typeof(a))
+b <- as.integer(a)
+print(typeof(b))
+print(b)
+
+# 文字列型
+c <- 'thank you!'
+print(typeof(c))
+
+# 論理型
+d <- FALSE
+print(typeof(d))
+
+```
+
+# ベクトルとarray
+- ベクトル: データの基本型 c(1,2,3)
+- array: 配列(次元数を自由に設定できる)
+
+```{r}
+vec <- c(1,2,3)
+print(typeof(vec))
+
+arr <- array(1:12, dim=c(2,6))
+print(typeof(arr))
+print(arr)
+```
+
+# データフレームとmatrix
+- データフレーム: 色々なデータ型が混じった行列
+- matrix: ベクトルをbindしたもの
+
+```{r}
+# matrixは行列にベクトルを追加する関数
+A = matrix(1:6, 2, 3)
+A
+```
+
+```{r}
+# matrixは行列にベクトルを追加する関数
+A = matrix(1:6, 2, 3)
+A
+```
+
+# dataframeについて
+```{r}
+data <- data.frame(氏名=c("kei", "mie", "tom"), 身長=c(178.9, 183.1, 172.3), 血液型=c("A","AB","O"))
+data
+```
+
+# 今日使うダミーデータを生成する
+今後ベイズ統計を用いていく場合に乱数生成の知識は役に立つ
+
+```{R}
+a <- rnorm(1000)
+# おまけ ggplotで可視化する（今度まとめて）
+hist(a)
+```
+
+```{r}
+b <- rpois(n = 1000, lambda = 4.5)
+hist(b)
+```
+
+```{r}
+c <- rbeta(n = 1000, shape1 = 5, shape2 = 2)
+hist(c)
+```
+
+
+
+# データフレームの整形
+```{r}
+data <- data.frame(a = a, b=b, c=c)
+```
+
+# おまけ
+## histgramをggplotで描画する
+
+```{r}
+g <- ggplot(data, aes(x=a))
+g <- g + geom_histogram()
+g
+```
+
+## violinplotをggplotで描画する
+
+```{r}
+data_long <- data %>% pivot_longer(cols = everything(), names_to = "Variable", values_to = "Value")
+g <- ggplot(data_long, aes(x=Variable, y=Value)) + geom_violin()
+g
+```
+ggplot2は今後標準で使用するライブラリなので今度まとめて勉強します
+
+
+# ファイルを読み込んでからデータフレームをいじってみる
+```{r}
+data <- data.frame(
+  a = rnorm(1000),
+  b = rnorm(1000),
+  c = rnorm(1000)
+)
+write.csv(data, "out.csv") # csvの書き出し
+save(data, file="data.RData")
+```
+
+```{r}
+# csvの読み込み
+#data <- read.csv("out.csv")
+load("data.RData")
+```
+
+# データフレームの統計量をみる
+```{r}
+summary(data)
+```
+```{r}
+# 行番号列番号で抽出
+data[1,3]
+```
+
+
+
+```{r}
+# 3行目を抽出
+data[3,]
+```
+
+```{r}
+# 1列目を抽出
+data[,1]
+```
+
+```{r}
+# 1列目の1-5行目を抽出
+data[1:5,1]
+```
+
+```{r}
+# 列で抽出する
+a = data$a
+```
+
+
+```{r}
+data$ave <- (data$a + data$b + data$c)/3
+```
+```{r}
+data.extract <- data[data$ave > 0.5, ]
+```
